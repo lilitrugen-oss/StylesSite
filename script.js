@@ -1,161 +1,160 @@
-/*
- * Polaris Penumbra — общий script.js
- * Навбар остаётся в index.html; страницы открываются внутри iframe.
- * Дополнительно исправляет отступы кода внутри загруженных страниц.
- * HTML и CSS менять не нужно.
- */
-(() => {
-  'use strict';
+// Switch between sections.
+const items = document.querySelectorAll('[data-section]');
+const sections = document.querySelectorAll('.section');
 
-  const pages = ['cave_css', 'den_css', 'html_codes', 'tutorials_and_rules'];
-  const tabs = [...document.querySelectorAll('.nav-item[data-page]')];
-  const frame = document.getElementById('section-frame');
+function showSection(item) {
+  sections.forEach(section => {
+    section.hidden = section.id !== item.dataset.section;
+  });
+  items.forEach(link => {
+    link.classList.toggle('active', link === item);
+    link.setAttribute('aria-pressed', String(link === item));
+  });
+}
 
-  // Remove only the indentation inherited from the HTML file's formatting.
-  // Preserve the indentation *inside* the code sample.
-  function normalizeCodeBlocks(doc) {
-    doc.querySelectorAll('.code-box code').forEach(block => {
-      const lines = block.textContent.replace(/\r\n?/g, '\n').split('\n');
+items.forEach(item => {
+  item.addEventListener('click', () => showSection(item));
+  item.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      showSection(item);
+    }
+  });
+});
 
-      // Empty first/last lines are usually introduced by <pre><code> markup.
-      while (lines.length && !lines[0].trim()) lines.shift();
-      while (lines.length && !lines[lines.length - 1].trim()) lines.pop();
+//подсветка HTML-кода и нумерация строк.
 
-      if (!lines.length) {
-        block.textContent = '';
-        return;
-      }
+function tokenizeHtml(src) {
+  const tokens = [];
+  const push = (cls, text) => { if (text) tokens.push([cls, text]); };
+  const tagRe = /<!--[\s\S]*?-->|<\/?[A-Za-z][^>]*>/g;
+  const attrRe = /([^\s"'<>\/=]+)(?:(\s*=\s*)("[^"]*"|'[^']*'|[^\s"'=<>`]+))?/g;
+  let last = 0;
+  let match;
 
-      // Spaces copied from editors can include non-breaking whitespace.
-      const normalized = lines.map(line =>
-        line.replace(/^[ \t\u00a0\u2007\u202f]+/, prefix =>
-          prefix.replace(/[\u00a0\u2007\u202f]/g, ' ')
-        )
-      );
+  while ((match = tagRe.exec(src))) {
+    push('', src.slice(last, match.index));
+    last = tagRe.lastIndex;
+    const chunk = match[0];
 
-      // Use the first non-empty line as the beginning of the sample.
-      // This also handles snippets where a later line has a smaller indent.
-      const firstLine = normalized.find(line => line.trim());
-      const baseIndent = (firstLine.match(/^[ \t]*/) || [''])[0].length;
-
-      block.textContent = normalized.map(line => {
-        if (!line.trim()) return '';
-        const currentIndent = (line.match(/^[ \t]*/) || [''])[0].length;
-        return line.slice(Math.min(baseIndent, currentIndent));
-      }).join('\n');
-    });
-  }
-
-  // Preserve the original Copy buttons and toast for documents that do not
-  // already have the section-specific pages/page.js script attached.
-  const copyDocuments = new WeakSet();
-  function setupCopyButtons(doc) {
-    if (copyDocuments.has(doc)) return;
-    copyDocuments.add(doc);
-
-    let toastTimer;
-    function showToast(message) {
-      const toast = doc.getElementById('status');
-      if (!toast) return;
-      clearTimeout(toastTimer);
-      toast.textContent = message;
-      toast.classList.add('visible');
-      toastTimer = setTimeout(() => toast.classList.remove('visible'), 1800);
+    if (chunk.startsWith('<!--')) {
+      push('comment', chunk);
+      continue;
     }
 
-    doc.querySelectorAll('[data-copy]').forEach(button => {
-      button.addEventListener('click', async () => {
-        const field = doc.getElementById(button.dataset.copy);
-        if (!field) return;
-        const value = field.value ?? field.textContent;
-        try {
-          if (navigator.clipboard && window.isSecureContext) {
-            await navigator.clipboard.writeText(value);
-          } else {
-            const buffer = doc.createElement('textarea');
-            buffer.value = value;
-            buffer.style.cssText = 'position:fixed;left:-9999px';
-            doc.body.append(buffer);
-            try {
-              buffer.select();
-              if (!doc.execCommand('copy')) throw new Error('Copy failed');
-            } finally {
-              buffer.remove();
-              button.focus();
-            }
-          }
-          showToast(field.classList.contains('code-box') ? 'HTML code copied!' : 'Link copied!');
-        } catch {
-          showToast('Copy failed. Select the text and press Ctrl+C.');
-        }
-      });
-    });
-  }
+    // <  или </   |  имя тега  |  атрибуты  |  > или />
+    const parts = /^(<\/?)([A-Za-z][\w:-]*)([\s\S]*?)(\/?>)$/.exec(chunk);
+    push('punct', parts[1]);
+    push('tag', parts[2]);
 
-  // If the page contains code directly, format it as in the original script.
-  normalizeCodeBlocks(document);
-  setupCopyButtons(document);
-
-  // A separate HTML page inside iframe has its own DOM. Format it ON LOAD,
-  // after the child page (and its own page.js, if any) has finished loading.
-  if (frame) {
-    frame.addEventListener('load', () => {
-      try {
-        const child = frame.contentDocument;
-        if (!child) return;
-        normalizeCodeBlocks(child);
-        // Do not install a second Copy handler when pages/page.js already
-        // handles it (the standard structure of this website).
-        const ownsCopy = [...child.scripts].some(script =>
-          /(?:^|\/)page\.js(?:[?#]|$)/.test(script.getAttribute('src') || '')
-        );
-        if (!ownsCopy) setupCopyButtons(child);
-      } catch (error) {
-        // Some browsers restrict access between local file:// documents.
-        // In that case code in the child page must be formatted by pages/page.js.
-        console.warn('Cannot format iframe content from the parent page:', error);
+    const attrs = parts[3];
+    let attrLast = 0;
+    let attr;
+    attrRe.lastIndex = 0;
+    while ((attr = attrRe.exec(attrs))) {
+      push('', attrs.slice(attrLast, attr.index));
+      push('attr', attr[1]);
+      if (attr[2] !== undefined) {
+        push('punct', attr[2]);
+        push('string', attr[3]);
       }
-    });
+      attrLast = attrRe.lastIndex;
+    }
+    push('', attrs.slice(attrLast));
+    push('punct', parts[4]);
   }
 
-  // Keep the existing persistent navigation. No redirect to a standalone page.
-  function pageFromHash() {
-    const name = decodeURIComponent(location.hash.slice(1));
-    return pages.includes(name) ? name : 'cave_css';
-  }
+  push('', src.slice(last));
+  return tokens;
+}
 
-  function showPage() {
-    const selected = pageFromHash();
-
-    tabs.forEach(tab => {
-      const active = tab.dataset.page === selected;
-      tab.classList.toggle('active', active);
-      tab.setAttribute('aria-pressed', String(active));
-      if (active) tab.setAttribute('aria-current', 'page');
-      else tab.removeAttribute('aria-current');
-    });
-
-    if (!frame) return;
-    const url = `pages/${selected}.html`;
-    if (frame.getAttribute('src') !== url) frame.setAttribute('src', url);
-    frame.title = tabs.find(tab => tab.dataset.page === selected)?.textContent.trim() || selected;
-  }
-
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      const hash = `#${tab.dataset.page}`;
-      if (location.hash !== hash) location.hash = hash;
-      else showPage();
-    });
-
-    tab.addEventListener('keydown', event => {
-      if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault();
-        tab.click();
-      }
+// Разбивает токены по строкам (токен может занимать несколько строк, например комментарий).
+function splitTokensIntoLines(tokens) {
+  const lines = [[]];
+  tokens.forEach(([cls, text]) => {
+    text.split('\n').forEach((part, index) => {
+      if (index > 0) lines.push([]);
+      if (part) lines[lines.length - 1].push([cls, part]);
     });
   });
+  return lines;
+}
 
-  window.addEventListener('hashchange', showPage);
-  showPage();
-})();
+function renderCodeBlock(pre) {
+  const codeEl = pre.querySelector('code') || pre;
+  const raw = codeEl.textContent
+    .replace(/\r\n?/g, '\n')
+    .replace(/^\n+/, '')
+    .replace(/\s+$/, '');
+
+  pre.dataset.raw = raw;
+
+  const lines = splitTokensIntoLines(tokenizeHtml(raw));
+  const fragment = document.createDocumentFragment();
+
+  lines.forEach(line => {
+    const row = document.createElement('span');
+    row.className = 'code-line';
+
+    const text = document.createElement('span');
+    text.className = 'code-text';
+
+    line.forEach(([cls, str]) => {
+      if (!cls) {
+        text.append(str);
+        return;
+      }
+      const token = document.createElement('span');
+      token.className = 'tok-' + cls;
+      token.textContent = str;   // textContent — никакого ручного экранирования < и &
+      text.append(token);
+    });
+
+    row.append(text);
+    fragment.append(row);
+  });
+
+  codeEl.replaceChildren(fragment);
+  pre.style.setProperty('--digits', String(lines.length).length);
+}
+
+document.querySelectorAll('pre.code-box').forEach(renderCodeBlock);
+
+//Show a temporary notification; repeated clicks restart its timer.
+let toastTimer;
+function showToast(message) {
+  const toast = document.getElementById('status');
+  clearTimeout(toastTimer);
+  toast.textContent = message;
+  toast.classList.add('visible');
+  toastTimer = setTimeout(() => toast.classList.remove('visible'), 1800);
+}
+
+// Copy the text from the matching card field.
+document.querySelectorAll('[data-copy]').forEach(button => {
+  button.addEventListener('click', async () => {
+    const field = document.getElementById(button.dataset.copy);
+    //для блоков кода берём исходный текст из data-raw, а не textContent
+    const text = field.dataset.raw ?? field.value ?? field.textContent;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const buffer = document.createElement('textarea');
+        buffer.value = text;
+        buffer.style.cssText = 'position:fixed;left:-9999px';
+        document.body.append(buffer);
+        try {
+          buffer.select();
+          if (!document.execCommand('copy')) throw new Error();
+        } finally {
+          buffer.remove();
+          button.focus();
+        }
+      }
+      showToast(field.classList.contains('code-box') ? 'HTML code copied!' : 'Link copied!');
+    } catch {
+      showToast('Copy failed. Select the text and press Ctrl+C.');
+    }
+  });
+});

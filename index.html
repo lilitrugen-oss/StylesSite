@@ -3,22 +3,203 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Polaris Penumbra | CSS &amp; HTML</title>
+  <title>Polaris Penumbra | CSS & HTML</title>
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="layout.css">
   <script src="script.js" defer></script>
 </head>
-<body class="site-shell">
-  <nav aria-label="Main navigation" class="navbar">
-    <div class="brand">Polaris Penumbra | CSS &amp; HTML</div>
+<body>
+  <nav class="navbar" aria-label="Main navigation">
+    <div class="brand">Polaris Penumbra | CSS & HTML</div>
+
     <div class="nav-links">
-      <div aria-pressed="true" class="nav-item active" data-page="cave_css" role="button" tabindex="0">Cave CSS</div>
-      <div aria-pressed="false" class="nav-item" data-page="branch_css" role="button" tabindex="0">Branch CSS</div>
-      <div aria-pressed="false" class="nav-item" data-page="html_codes" role="button" tabindex="0">HTML Codes</div>
-      <div aria-pressed="false" class="nav-item" data-page="tutorials_and_rules" role="button" tabindex="0">Tutorials and Rules</div>
+      <div class="nav-item active" role="button" tabindex="0" data-section="section-1" aria-controls="section-1" aria-pressed="true">Cave CSS</div>
+      <div class="nav-item" role="button" tabindex="0" data-section="section-2" aria-controls="section-2" aria-pressed="false">Branch CSS</div>
+      <div class="nav-item" role="button" tabindex="0" data-section="section-3" aria-controls="section-3" aria-pressed="false">HTML Codes</div>
+      <div class="nav-item" role="button" tabindex="0" data-section="section-4" aria-controls="section-4" aria-pressed="false">Tutorials and Rules</div>
     </div>
+
   </nav>
 
-  <iframe id="section-frame" name="section-frame" src="pages/cave_css.html" title="Cave CSS" aria-label="Current section" referrerpolicy="no-referrer-when-downgrade"></iframe>
+
+  <main class="container">
+    <div class="section" id="section-1">
+      <h2>Cave CSS</h2>
+      <div class="cards">
+        <article class="card">
+          <img class="card-image" src="https://i.postimg.cc/pVzkLj2C/evening-Sky.png" alt="evening sky" width="640" height="360">
+          <div class="card-body">
+            <h3>Sky</h3>
+            
+            <div>
+              <span class="field-label" id="label-link-1-1">Link</span>
+
+              <div class="copy-row">
+                <div class="link-field" id="link-1-1" role="textbox" aria-readonly="true" aria-labelledby="label-link-1-1" tabindex="0">https://cdn.jsdelivr.net/gh/lilitrugen-oss/NewCSS@refs/heads/main/eveningSky.css</div>
+                <button type="button" class="copy-button" data-copy="link-1-1">Copy</button>
+              </div>
+
+            </div>
+            <div class="credits">
+              Credits:
+              <ul>
+                <li>Image author: <a href="https://images.pexels.com/photos/5722854/pexels-photo-5722854.jpeg">Juan González</a></li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <img class="card-image" src="https://i.postimg.cc/Yq6wwjGd/evening2.png" alt="Card preview" width="640" height="360">
+          <div class="card-body">
+            <h3>Evening</h3>
+            
+            <div>
+              <span class="field-label" id="label-link-1-2">Link</span>
+              <div class="copy-row">
+                <div class="link-field" id="link-1-2" role="textbox" aria-readonly="true" aria-labelledby="label-link-1-2" tabindex="0">https://cdn.jsdelivr.net/gh/lilitrugen-oss/NewCSS@refs/heads/main/evening2.css</div>
+                <button type="button" class="copy-button" data-copy="link-1-2">Copy</button>
+              </div>
+            </div>
+            <div class="credits">
+              Credits:
+              <ul>
+                <li>Image author: <a href="https://cdn.pixabay.com/photo/2020/11/08/12/27/stairs-5723586_1280.jpg">Pixsas</a></li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <img class="card-image" src="https://i.postimg.cc/yNsVgc9C/Sea.png" alt="Card preview" width="640" height="360">
+          <div class="card-body">
+            <h3>Night Sea</h3>
+            
+            <div>
+              <span class="field-label" id="label-link-1-3">Link</span>
+              <div class="copy-row">
+                <div class="link-field" id="link-1-3" role="textbox" aria-readonly="true" aria-labelledby="label-link-1-3" tabindex="0">https://cdn.jsdelivr.net/gh/lilitrugen-oss/NewCSS@refs/heads/main/sea.css</div>
+                <button type="button" class="copy-button" data-copy="link-1-3">Copy</button>
+              </div>
+            </div>
+            <div class="credits">
+              Credits:
+              <ul>
+                <li>Image author: <a href="https://images.pexels.com/photos/17241532/pexels-photo-17241532.jpeg">Alina Rossoshanska</a></li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <img class="card-image" src="https://i.postimg.cc/xdGrb3bv/Purple-Beach.png" alt="Card preview" width="640" height="360">
+          <div class="card-body">
+            <h3>Purple Beach</h3>
+            
+            <div>
+              <!-- ИСПРАВЛЕНО: id были дублем link-1-3, из-за чего кнопка копировала ссылку от "Night Sea" -->
+              <span class="field-label" id="label-link-1-4">Link</span>
+              <div class="copy-row">
+                <div class="link-field" id="link-1-4" role="textbox" aria-readonly="true" aria-labelledby="label-link-1-4" tabindex="0">https://cdn.jsdelivr.net/gh/lilitrugen-oss/NewCSS@refs/heads/main/purple-beach.css</div>
+                <button type="button" class="copy-button" data-copy="link-1-4">Copy</button>
+              </div>
+            </div>
+            <div class="credits">
+              Credits:
+              <ul>
+                <li>Image author: <a href="https://images.pexels.com/photos/34210891/pexels-photo-34210891.jpeg">Giang Nguyễn</a></li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+
+    <div class="section" id="section-2" hidden>
+      <h2>Branch CSS</h2>
+      <div class="cards">
+        
+      </div>
+    </div>
+
+    <div class="section" id="section-3" hidden>
+      <h2>HTML Codes</h2>
+      <div class="cards">
+
+        <article class="card">
+          <img class="card-image" src="https://i.postimg.cc/fRPrJZQH/html1.png" alt="Card preview" width="640" height="360">
+          <div class="card-body">
+            <h3>Boxes</h3>
+
+            <div class="code-block">
+              <div class="code-head">
+                <span class="code-lang" id="label-code-1">HTML code</span>
+                <button type="button" class="copy-button" data-copy="code-1">Copy</button>
+              </div>
+              <pre class="code-box" id="code-1" tabindex="0" aria-labelledby="label-code-1"><code class="language-html">&lt;!--Box Template--&gt;
+&lt;div class="container-block-main"&gt;
+    &lt;span class="block-main block1-info"&gt;
+      &lt;font size="5" color="#d87e94"&gt;Header 1&lt;/font&gt;
+      &lt;font&gt;Block Text 1&lt;/font&gt;
+    &lt;/span&gt;
+
+    &lt;span class="block-main block2-info"&gt;
+      &lt;font size="5" color="#d87e94"&gt;Header 2&lt;/font&gt;
+      &lt;font&gt;Block Text 2&lt;/font&gt;
+    &lt;/span&gt;
+
+    &lt;span class="block-main block3-info"&gt;
+      &lt;font size="5" color="#d87e94"&gt;Header 3&lt;/font&gt;
+        &lt;!--Lion Card--&gt;
+        &lt;span class="block-lion-card"&gt;&lt;font class="lion-card-name"&gt;&lt;b&gt;Lion Name&lt;/b&gt;&lt;/font&gt;
+            &lt;font&gt;&lt;a href="https://www.lioden.com/lion.php?id=794257730927"&gt;   &lt;!--Link to lion--&gt;
+                &lt;img src="https://i.ibb.co/dsnwNVpZ/lioden-wardrobe-26.png" alt="2"&gt;&lt;/a&gt; &lt;!--Link to imade--&gt;
+                &lt;/font&gt;&lt;font&gt;Description&lt;/font&gt;&lt;/span&gt;&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <div class="section" id="section-4" hidden>
+      <h2>Tutorial and Rules</h2>
+      <div class="cards cards--column">
+
+        <article class="card card--tutorial">
+          <div class="card-body">
+            <h3>Rules</h3>
+            <ul class="tutorial-steps">
+              <li>✎ᝰ.Do not remove my credit</li>
+              <li>✎ᝰ.You may not resell/redistribute my CSS</li>
+              <li>✎ᝰ.Boxes/HTML only work when CSS is connected</li>
+              <li>✎ᝰ.CSS only works in caves or branch</li>
+              <li>✎ᝰ.You can suggest an idea for me to implement, but I reserve the right to decline</li>
+              <li>✎ᝰ.You are allowed to edit my css code, provided you give me credit.</li>
+            </ul>
+          </div>
+        </article>
+
+
+        <article class="card card--tutorial">
+          <div class="card-body">
+            <h3>Tutorials</h3>
+            <ul class="tutorial-steps">
+              <li>✎ᝰ.To apply CSS in cave, copy the link in the card of the style you like and paste it into the field under number 1(Cave CSS URL).</li>
+              <li>✎ᝰ.To use the blocks in the cave, copy the HTML code and paste it into field number 2(Cave Description).</li>
+              <li>✎ᝰ.To apply CSS to your branch, copy the link from the card for the style you want and paste it into the "description" field. The link is marked with the number 3 in the image.</li>
+              <li>✎ᝰ.To use the blocks to your branch, copy the HTML code and paste it into the "description" field below the CSS link. The HTML is marked with the number 4 in the image.</li>
+            </ul>
+          </div>
+          <div class="tutorial-media">
+            <figure><img src="https://i.postimg.cc/jqmDmSrP/Inst1.jpg" alt="Tutorial, illustration 1" width="640" height="360" loading="lazy"></figure>
+            <figure><img src="https://i.postimg.cc/jj1cLn1B/Inst2.jpg" alt="Tutorial, illustration 2" width="640" height="360" loading="lazy"></figure>
+          </div>
+        </article>
+      </div>
+    </div>
+
+  </main>
+  <div id="status" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 </body>
 </html>
